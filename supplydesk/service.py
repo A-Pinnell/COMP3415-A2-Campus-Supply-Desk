@@ -45,7 +45,7 @@ class OrderService:
                 "line_total_cents": line_total,
             })
         discount = 0
-        if customer_type == "student" and subtotal > 5000:
+        if customer_type == "student" and subtotal >= 5000:
             discount = (subtotal * 10 + 50) // 100
         delivery = 0
         if fulfillment == "delivery" and subtotal - discount < 10000:
@@ -95,7 +95,7 @@ class OrderService:
                 "line_total_cents": line_total,
             })
         discount = 0
-        if customer_type == "student" and subtotal > 5000:
+        if customer_type == "student" and subtotal >= 5000:
             discount = (subtotal * 10 + 50) // 100
         delivery = 0
         if fulfillment == "delivery" and subtotal - discount < 10000:
