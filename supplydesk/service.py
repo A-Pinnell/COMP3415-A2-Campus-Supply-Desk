@@ -10,6 +10,7 @@ STUDENT_DISCOUNT_THRESHOLD_CENTS = 5000
 STUDENT_DISCOUNT_PERCENT = 10
 FREE_DELIVERY_THRESHOLD_CENTS = 10000
 DELIVERY_FEE_CENTS = 600
+EXPRESS_DELIVERY_FEE_CENTS = 1200
 PERCENTAGE_DIVISOR = 100
 DISCOUNT_ROUNDING_ADJUSTMENT = 50
 ORDER_ID_WIDTH = 4
@@ -77,6 +78,8 @@ class OrderService:
     @staticmethod
     def _calculate_delivery(fulfillment, subtotal, discount):
         """Return the standard delivery fee when the order is below the threshold."""
+        if fulfillment == "express":
+            return EXPRESS_DELIVERY_FEE_CENTS
         if (fulfillment == "delivery"
                 and subtotal - discount < FREE_DELIVERY_THRESHOLD_CENTS):
             return DELIVERY_FEE_CENTS
@@ -86,8 +89,8 @@ class OrderService:
         """Build the shared pricing result used by quotes and placed orders."""
         if customer_type not in ("regular", "student"):
             raise ValueError("Customer type must be regular or student.")
-        if fulfillment not in ("pickup", "delivery"):
-            raise ValueError("Fulfillment must be pickup or delivery.")
+        if fulfillment not in ("pickup", "delivery", "express"):
+            raise ValueError("Fulfillment must be pickup, delivery, or express.")
 
         lines, subtotal = self._build_item_lines(state["catalog"], items)
         discount = self._calculate_discount(customer_type, subtotal)

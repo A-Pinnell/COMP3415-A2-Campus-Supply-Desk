@@ -57,7 +57,7 @@ place_order(customer_type, items, fulfillment="pickup")
 Both operations require:
 
 - Customer type: exactly `regular` or `student`.
-- Fulfillment: exactly `pickup` or `delivery`.
+- Fulfillment: exactly `pickup`, `delivery`, or `express` (CR-01).
 - Items: a nonempty list of dictionaries, each containing `product_id` and `quantity`.
 - A valid product ID for every item.
 - An integer quantity from 1 through 99 inclusive for each item. Booleans, fractional numbers, and numeric strings are not valid quantities when calling the service directly.
@@ -86,14 +86,17 @@ All service calculations and stored monetary values use integer Canadian cents.
 2. A student receives a 10% discount when the subtotal is at least 5,000 cents ($50.00). Regular customers receive no discount.
 3. Round the discount to the nearest whole cent, with half a cent rounded upward. Do not use binary floating-point values for money calculations.
 4. Pickup is free.
-5. Delivery costs 600 cents ($6.00). Delivery is free when the subtotal minus the discount is at least 10,000 cents ($100.00).
-6. Total = subtotal minus discount plus delivery charge. No taxes or other charges apply.
+5. Standard delivery costs 600 cents ($6.00). Standard delivery is free when the subtotal minus the discount is at least 10,000 cents ($100.00).
+6. Express delivery always costs 1,200 cents ($12.00), regardless of the merchandise subtotal or discount. The express fee is never waived.
+7. Total = subtotal minus discount plus the selected delivery charge. No taxes or other charges apply.
 
 Examples—all amounts below are in cents:
 
 - Regular pickup, two notebooks: subtotal 1,000; discount 0; delivery 0; total 1,000.
-- Student delivery, two hoodies: subtotal 8,000; discount 800; delivery 600; total 7,800.
-- Regular delivery, three hoodies: subtotal 12,000; discount 0; delivery 0; total 12,000.
+- Student standard delivery, two hoodies: subtotal 8,000; discount 800; delivery 600; total 7,800.
+- Student express delivery, two hoodies: subtotal 8,000; discount 800; delivery 1,200; total 8,400.
+- Regular standard delivery, three hoodies: subtotal 12,000; discount 0; delivery 0; total 12,000.
+- Regular express delivery, three hoodies: subtotal 12,000; discount 0; delivery 1,200; total 13,200.
 
 These rules apply identically to quotes and placed orders.
 
@@ -163,7 +166,7 @@ The menu provides catalog viewing, quotes, placement, history, lookup, and cance
 Menu behavior:
 
 - Display money in Canadian dollars. Service calculations and stored values remain in integer cents.
-- Default to `regular` and `pickup` when those prompts are left blank.
+- Default to `regular` and `pickup` when those prompts are left blank. Express is an additional explicit fulfillment choice (CR-01).
 - Finish collecting items when the product-ID prompt is left blank.
 - Require a `y` confirmation before placing or cancelling an order. Declining must leave saved data unchanged.
 - Report invalid requests and return to the main menu. If quantity text cannot be converted to an integer, ask the user to re-enter the item.

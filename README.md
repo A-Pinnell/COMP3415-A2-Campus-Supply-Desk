@@ -95,15 +95,9 @@ From the folder containing `README.md`, `supplydesk`, and `tests`, run:
 python -m unittest discover -s tests -v
 ```
 
-The supplied tests should finish with:
+The full suite should finish with 17 tests passing. This includes the four starter smoke tests, four Task 2 safety-net tests, and nine CR-01 Express Delivery acceptance tests.
 
-```text
-Ran 4 tests
-
-OK
-```
-
-These four tests are a starting point. **Passing them does not mean every required behavior is correct.** You will add meaningful tests as part of the assignment.
+**Passing tests is evidence for the covered behaviors, not proof that every possible input has been tested.**
 
 The supplied tests use temporary files and do not change your saved orders or stock.
 
@@ -172,6 +166,7 @@ You can perform operations directly instead of using the menu. These commands ar
 python -m supplydesk catalog
 python -m supplydesk quote --customer regular --item notebook:2
 python -m supplydesk quote --customer student --fulfillment delivery --item hoodie:2
+python -m supplydesk quote --customer student --fulfillment express --item hoodie:2
 ```
 
 Use repeated `--item` options for multiple items:
@@ -194,6 +189,14 @@ Replace `ORD-0001` with the actual ID returned when you place your order.
 Unlike the interactive menu, individual `place` and `cancel` commands perform the action immediately without asking for confirmation.
 
 Individual commands display JSON. Prices are expressed in cents: for example, `"total_cents": 1000` means **CAD $10.00**.
+
+### Fulfillment options
+
+- `pickup` is free and remains the default.
+- `delivery` costs CAD $6.00 unless the discounted merchandise subtotal is at least CAD $100.00, in which case standard delivery is free.
+- `express` always costs CAD $12.00. The express fee is never waived, including on orders that qualify for free standard delivery.
+
+Use `--fulfillment express` with either `quote` or `place`. The interactive menu also accepts `express` at its fulfillment prompt. Student discounts apply to merchandise only; delivery charges are added after the discount.
 
 Successful commands return exit status `0`. Rejected input returns exit status `2` and an error message.
 
