@@ -95,7 +95,7 @@ From the folder containing `README.md`, `supplydesk`, and `tests`, run:
 python -m unittest discover -s tests -v
 ```
 
-The full suite should finish with 17 tests passing. This includes the four starter smoke tests, four Task 2 safety-net tests, and nine CR-01 Express Delivery acceptance tests.
+The full suite should finish with 22 tests passing. This includes the four starter smoke tests, four Task 2 safety-net tests, nine CR-01 Express Delivery acceptance tests, four Task 6 engineering judgment tests, and one additional regression test for combined product quantities exceeding available stock.
 
 **Passing tests is evidence for the covered behaviors, not proof that every possible input has been tested.**
 
@@ -217,3 +217,7 @@ These commands use the same orders and stock as the interactive menu opened with
 python -m supplydesk --help
 python -m supplydesk quote --help
 ```
+
+## Task 6 engineering judgment
+
+Task 6 adds idempotent cancellation, atomic JSON state writes, and regression coverage for the CR-01 exact-threshold student discount plus express fee interaction. Run the full suite with `python -m unittest discover -s tests -v`.

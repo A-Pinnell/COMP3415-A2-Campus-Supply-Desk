@@ -1,6 +1,8 @@
 """JSON storage used by the local order desk."""
 
 import json
+import os
+import tempfile
 from pathlib import Path
 
 
@@ -23,7 +25,25 @@ class JsonStore:
         }
 
     def save(self, state):
+        """Atomically replace the state file after a complete JSON write."""
         self.path.parent.mkdir(parents=True, exist_ok=True)
-        with self.path.open("w", encoding="utf-8") as stream:
-            json.dump(state, stream, indent=2)
-            stream.write("\n")
+        temporary_path = None
+        try:
+            with tempfile.NamedTemporaryFile(
+                mode="w",
+                encoding="utf-8",
+                dir=self.path.parent,
+                prefix=f".{self.path.name}.",
+                suffix=".tmp",
+                delete=False,
+            ) as stream:
+                temporary_path = Path(stream.name)
+                json.dump(state, stream, indent=2)
+                stream.write("\n")
+                stream.flush()
+                os.fsync(stream.fileno())
+            os.replace(temporary_path, self.path)
+            temporary_path = None
+        finally:
+            if temporary_path is not None:
+                temporary_path.unlink(missing_ok=True)

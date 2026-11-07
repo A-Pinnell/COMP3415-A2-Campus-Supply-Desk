@@ -50,8 +50,6 @@ class OrderService:
                     "Quantity must be an integer from "
                     f"{MIN_ORDER_QUANTITY} to {MAX_ORDER_QUANTITY}."
                 )
-            if quantity > product["stock"]:
-                raise ValueError("Not enough stock for " + product["product_id"] + ".")
 
             line_total = product["unit_price_cents"] * quantity
             subtotal += line_total
@@ -62,6 +60,24 @@ class OrderService:
                 "quantity": quantity,
                 "line_total_cents": line_total,
             })
+
+        # Validate the combined quantity for each product.
+        requested_quantities = {}
+
+        for line in lines:
+            product_id = line["product_id"]
+            requested_quantities[product_id] = (
+                requested_quantities.get(product_id, 0) + line["quantity"]
+            )
+
+        for product_id, requested_quantity in requested_quantities.items():
+            product = next(
+                candidate for candidate in catalog
+                if candidate["product_id"] == product_id
+            )
+
+            if requested_quantity > product["stock"]:
+                raise ValueError("Not enough stock for " + product_id + ".")
 
         return lines, subtotal
 
@@ -151,6 +167,9 @@ class OrderService:
                 break
         if order is None:
             raise ValueError("Unknown order: " + order_id)
+        # Cancellation is idempotent: inventory is restored only on the first call.
+        if order["status"] == "cancelled":
+            return order
         for line in order["items"]:
             for product in state["catalog"]:
                 if product["product_id"] == line["product_id"]:

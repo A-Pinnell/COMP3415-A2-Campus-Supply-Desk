@@ -73,6 +73,25 @@ class OrderServiceSafetyNetTests(unittest.TestCase):
         )
         self.assertEqual(reopened.list_orders(), [cancelled])
 
+    def test_duplicate_product_lines_cannot_exceed_combined_stock(self):
+        items = [
+            {"product_id": "notebook", "quantity": 11},
+            {"product_id": "notebook", "quantity": 10},
+        ]
+
+        with self.assertRaises(ValueError):
+            self.service.place_order("regular", items, "pickup")
+
+        self.assertFalse(self.path.exists())
+
+        notebook = next(
+            product for product in self.service.catalog()
+            if product["product_id"] == "notebook"
+        )
+
+        self.assertEqual(notebook["stock"], 20)
+        self.assertEqual(self.service.list_orders(), [])
+
 
 if __name__ == "__main__":
     unittest.main()
